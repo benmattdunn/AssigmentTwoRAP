@@ -1,0 +1,11 @@
+{
+  "name": "assignmenttworap",
+  "version": "0.0.1",
+  "description": "simple calculator for car prices created in windows forms",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC"
+}
