@@ -46,6 +46,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ApplicationCommonWindows\AboutForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ApplicationCommonWindows\AboutForm.Designer.cs">
+      <DependentUpon>AboutForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="BackGroundClasses\InputTester.cs" />
     <Compile Include="SharpAutoCenter.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -54,6 +61,9 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="ApplicationCommonWindows\AboutForm.resx">
+      <DependentUpon>AboutForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="SharpAutoCenter.resx">
       <DependentUpon>SharpAutoCenter.cs</DependentUpon>
     </EmbeddedResource>
