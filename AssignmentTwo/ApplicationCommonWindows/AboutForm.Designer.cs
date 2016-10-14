@@ -1,5 +1,9 @@
 ﻿namespace AssignmentTwo.ApplicationCommonWindows
 {
+
+    /// <summary>
+    /// creates the from, see main for full doc and reason for creating this. 
+    /// </summary>
     partial class AboutForm
     {
         /// <summary>
