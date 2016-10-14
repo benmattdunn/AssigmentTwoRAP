@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 /// <summary>
 /// Created by Ben Dunn, OCT 11 2016
-/// 
+/// Student Number 100098171 at Georgian College Ontario. 
 /// Creates validation methods for inputs making sure that they contain proper values, used to 
 /// reduce code size on the front end. 
 /// 

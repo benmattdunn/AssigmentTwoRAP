@@ -78,9 +78,11 @@
             this.fontToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.defaultToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.arielStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.customFontToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.colorToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.redToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.blackToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.customColorToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.MainItemsTableLayoutPanel = new System.Windows.Forms.TableLayoutPanel();
@@ -166,6 +168,7 @@
             this.calculateToolStripMenuItem.Name = "calculateToolStripMenuItem";
             this.calculateToolStripMenuItem.Size = new System.Drawing.Size(123, 22);
             this.calculateToolStripMenuItem.Text = "Calculate";
+            this.calculateToolStripMenuItem.Click += new System.EventHandler(this.calculateForm_Click);
             // 
             // clearToolStripMenuItem
             // 
@@ -178,7 +181,8 @@
             // 
             this.fontToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.defaultToolStripMenuItem,
-            this.arielStripMenuItem});
+            this.arielStripMenuItem,
+            this.customFontToolStripMenuItem1});
             this.fontToolStripMenuItem.Name = "fontToolStripMenuItem";
             this.fontToolStripMenuItem.Size = new System.Drawing.Size(123, 22);
             this.fontToolStripMenuItem.Text = "Font";
@@ -186,22 +190,30 @@
             // defaultToolStripMenuItem
             // 
             this.defaultToolStripMenuItem.Name = "defaultToolStripMenuItem";
-            this.defaultToolStripMenuItem.Size = new System.Drawing.Size(112, 22);
+            this.defaultToolStripMenuItem.Size = new System.Drawing.Size(116, 22);
             this.defaultToolStripMenuItem.Text = "Default";
             this.defaultToolStripMenuItem.Click += new System.EventHandler(this.changeFont_click);
             // 
             // arielStripMenuItem
             // 
             this.arielStripMenuItem.Name = "arielStripMenuItem";
-            this.arielStripMenuItem.Size = new System.Drawing.Size(112, 22);
+            this.arielStripMenuItem.Size = new System.Drawing.Size(116, 22);
             this.arielStripMenuItem.Text = "Ariel";
             this.arielStripMenuItem.Click += new System.EventHandler(this.changeFont_click);
+            // 
+            // customFontToolStripMenuItem1
+            // 
+            this.customFontToolStripMenuItem1.Name = "customFontToolStripMenuItem1";
+            this.customFontToolStripMenuItem1.Size = new System.Drawing.Size(116, 22);
+            this.customFontToolStripMenuItem1.Text = "Custom";
+            this.customFontToolStripMenuItem1.Click += new System.EventHandler(this.changeFont_click);
             // 
             // colorToolStripMenuItem
             // 
             this.colorToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.redToolStripMenuItem,
-            this.blackToolStripMenuItem});
+            this.blackToolStripMenuItem,
+            this.customColorToolStripMenuItem});
             this.colorToolStripMenuItem.Name = "colorToolStripMenuItem";
             this.colorToolStripMenuItem.Size = new System.Drawing.Size(123, 22);
             this.colorToolStripMenuItem.Text = "Color";
@@ -209,16 +221,23 @@
             // redToolStripMenuItem
             // 
             this.redToolStripMenuItem.Name = "redToolStripMenuItem";
-            this.redToolStripMenuItem.Size = new System.Drawing.Size(102, 22);
+            this.redToolStripMenuItem.Size = new System.Drawing.Size(116, 22);
             this.redToolStripMenuItem.Text = "Red";
             this.redToolStripMenuItem.Click += new System.EventHandler(this.changeColor_Click);
             // 
             // blackToolStripMenuItem
             // 
             this.blackToolStripMenuItem.Name = "blackToolStripMenuItem";
-            this.blackToolStripMenuItem.Size = new System.Drawing.Size(102, 22);
+            this.blackToolStripMenuItem.Size = new System.Drawing.Size(116, 22);
             this.blackToolStripMenuItem.Text = "Black";
             this.blackToolStripMenuItem.Click += new System.EventHandler(this.changeColor_Click);
+            // 
+            // customColorToolStripMenuItem
+            // 
+            this.customColorToolStripMenuItem.Name = "customColorToolStripMenuItem";
+            this.customColorToolStripMenuItem.Size = new System.Drawing.Size(116, 22);
+            this.customColorToolStripMenuItem.Text = "Custom";
+            this.customColorToolStripMenuItem.Click += new System.EventHandler(this.changeColor_Click);
             // 
             // helpToolStripMenuItem
             // 
@@ -231,7 +250,7 @@
             // aboutToolStripMenuItem
             // 
             this.aboutToolStripMenuItem.Name = "aboutToolStripMenuItem";
-            this.aboutToolStripMenuItem.Size = new System.Drawing.Size(107, 22);
+            this.aboutToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.aboutToolStripMenuItem.Text = "About";
             this.aboutToolStripMenuItem.Click += new System.EventHandler(this.aboutToolStripMenuItem_Click);
             // 
@@ -581,12 +600,14 @@
             this.Controls.Add(this.MainItemsTableLayoutPanel);
             this.Controls.Add(this.mainMenuStrip);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
+            this.KeyPreview = true;
             this.MainMenuStrip = this.mainMenuStrip;
             this.MaximizeBox = false;
             this.Name = "SharpAutoCenter";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Sharp AutoCenter";
-            this.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.SharpAutoCenter_KeyPress);
+            this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.StackedListen_KeyDown);
+            this.KeyUp += new System.Windows.Forms.KeyEventHandler(this.StackedListen_KeyUp);
             this.mainMenuStrip.ResumeLayout(false);
             this.mainMenuStrip.PerformLayout();
             this.MainItemsTableLayoutPanel.ResumeLayout(false);
@@ -655,6 +676,8 @@
         private System.Windows.Forms.ToolStripMenuItem defaultToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem arielStripMenuItem;
         #endregion
+        private System.Windows.Forms.ToolStripMenuItem customFontToolStripMenuItem1;
+        private System.Windows.Forms.ToolStripMenuItem customColorToolStripMenuItem;
     }
 
 

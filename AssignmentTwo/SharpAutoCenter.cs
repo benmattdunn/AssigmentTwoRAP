@@ -10,6 +10,44 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
+/// <summary>
+/// Created by ben dunn
+/// Student ID 100098171
+/// Final changes 10, 14, 2016
+/// sharp auto center assignment for toms RAD class. 
+/// 
+/// Contains the following additional items: (I focused on the back end, as I've learned that more features are worthless with near perfect stability...
+/// plus I'm using this to learn a little about how the forms handle behind the scenes for listeners and threads for... well making a game). 
+/// 
+/// -Controls for setting the text too one of two defaults, along with color (plus the color text box prompt)
+/// 
+/// -changes text color for all controls(that inherite the default form the parrent), not ust listed
+/// 
+/// -threaded error handler, however it should almost never be thrown (I haven't managed to break it yet) as the validation code is solid
+/// 
+/// -> used a custom additional form instead of the message box class for about to see how a form with custom text could be initialized.
+/// -Smart keyboard listener with multi keystroke listening, used a list of strings to capture key down events, and then if try for multiple 
+/// then execute event. CTR + key did not bring the focus away from the text boxes, so upon activation of the event, the focus is changed to 
+/// the addition ooptions lable. By doing this, in this order it allowed that the text boxes would not be changed during a CTR+key event.
+/// which was problematic as it meant that the short cuts were at issue.
+/// 
+/// -> Threaded, one handles validating input and setting textboxes that have invalid values to 0.00, along with (briefly marking them as 
+/// red), one mointers the radio buttons and check lists for value changes rather then triggering an event (much more elegent), and one
+/// throws user exceptions (which seem to be completely impossible due to how I've limited the users total access to even inputting errors). 
+/// 
+/// -> static class for validation outside of the main class, reduced code size on page somewhat, however in the future I'll expand this 
+/// static class to include all non-activation methods to remove bloat.
+/// 
+/// -> program aborts gracefully under all circumstances, (see thread abortion code). 
+/// 
+/// -> used the layout features and allowed resizing on controls meaning that the window resizes gracefully with font change. (basically, no
+/// matter what font you use, it will still look good and similar). 
+/// 
+/// Basically, most of the additional stuff that was above and beyond was behind the scenes. The GUI itself is the minimumn, but the functionality
+/// and stability were my focus. (basically my co-op taught me that if a user can possibily break something, they will). Which is now where I know 
+/// to put the most effort. 
+/// 
+/// </summary>
 namespace AssignmentTwo
 {
     /// <summary>
@@ -19,11 +57,11 @@ namespace AssignmentTwo
     /// </summary>
     public partial class SharpAutoCenter : Form
     {
-        //exception shifter, simple for just management
+        //exception shifter, simple
         private Exception _firstException;
         private Exception _secondException;
 
-        //two fonts
+        //two default fonts for testing orginally, however kept in as they give a nice "return to defaults" option/ 
         private Font _defaultFont;
         private Font _arialFont;
         //Three threads
@@ -31,13 +69,24 @@ namespace AssignmentTwo
         private Thread _GUIWarningsThread; //thread that turns color boxes red if a value in them is incorrect
         private Thread _valuesUpdateThread; //mointers the checkboxes and updates the values as needed. 
 
+        private List<String> _pressedKeys = new List<String>(); //was orignally keys, however for the scope of this project string was much more efficent. 
+        //private Queue<Keys> keyQueue = new Queue<Keys>(); ->I'll use this in another project for shinanigins.
+
+        //standard font and color dialoug
+        private FontDialog _fontDialog;
+        private ColorDialog _colorDialog;
+
+        //almost never used as the calculation is mostly "front end" with these values being updated to match the controls.
+        //stored for the final calculation (click) however in reality I could actually just remove this button completely 
+        //as the program auto updates as it moves along. (it was to kept to meet the assignment requirements). 
         private double _salesTax = 0.13;
         private double _additionalOptions = 0;
         private double _subTotal = 0;
         private double _salesTaxSubTotal = 0;
         private double _totalValueBeforeTradeIn = 0;
-        
+        private double _finalTotal = 0;
 
+        //runtime status, used to abort threaded while loops
         private bool _runningStatus = true;
 
         /// <summary>
@@ -51,10 +100,12 @@ namespace AssignmentTwo
         }
 
         /// <summary>
-        /// Initalizes the custom fonts
+        /// Initalizes the custom fonts, and color window. 
         /// </summary>
         private void _initalizeFonts()
         {
+            this._fontDialog = new FontDialog();
+            this._colorDialog = new ColorDialog();
             this._defaultFont = this.Font;
             try { //should never be thrown, but it can happen
                 this._arialFont = new Font("Arial", 12, FontStyle.Bold);
@@ -83,9 +134,14 @@ namespace AssignmentTwo
             this._valuesUpdateThread = new Thread(
                 new ThreadStart(this._mointerCheckBoxesAndRadioButtons));
             this._valuesUpdateThread.Start();
+
         }
 
-        
+        /// <summary>
+        /// Goes into a thread, mointers the checkbox value changes and updates the GUI,
+        /// in reality this method has alot more scope then it lets on as in praticallity 
+        /// it really actually "does most" of the raw calculation and updating. 
+        /// </summary>
         private void _mointerCheckBoxesAndRadioButtons()
         {
 
@@ -187,6 +243,31 @@ namespace AssignmentTwo
 
 
         /// <summary>
+        /// prompts warnings from all possible errors Using message box, handled by an 
+        /// external thread that listens to possible changes. 
+        /// </summary>
+        private void _promtErrorWarning()
+        {
+            this._firstException = new Exception("no error");
+            this._secondException = this._firstException;
+            do
+            {
+
+                if (!(this._firstException.Equals(this._secondException)))
+                {
+                    this._firstException = this._secondException; // make them the same, to prevent further catching
+                    MessageBox.Show(this._secondException.Message, "ERROR!");
+
+                }
+                Thread.Sleep(10);
+            } while (this._runningStatus);
+        }
+
+      
+
+
+
+        /// <summary>
         /// Takes a control and allows the generic update of the control via a thread or an outside 
         /// class. Allows the invoke of a new action aimed at the control of the text field.
         /// this class may be made more generic later on. Used a lambda to invoke a new
@@ -207,27 +288,22 @@ namespace AssignmentTwo
         }
 
 
+
+
+
+
+
+
+
         /// <summary>
-        /// prompts warnings from all possible errors Using message box, handled by an 
-        /// external thread that listens to possible changes. 
+        /// Brings up the about form with a simple string. 
         /// </summary>
-        private void _promtErrorWarning ()
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void aboutToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            this._firstException = new Exception("no error");
-            this._secondException = this._firstException;
-           do {
-
-                if (!(this._firstException.Equals(this._secondException)))
-                {
-                    this._firstException = this._secondException; // make them the same, to prevent further catching
-                    MessageBox.Show(this._secondException.Message, "ERROR!");
-                    
-                }
-                Thread.Sleep(10);
-            } while (this._runningStatus) ;
+            this._callAbout();
         }
-
-
         /// <summary>
         /// closes the program gracefully by disposing all components. 
         /// </summary>
@@ -238,27 +314,31 @@ namespace AssignmentTwo
         }
 
 
-        /// <summary>
-        /// calls the close function
-        ///
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void exitEvent_Click(object sender, EventArgs e)
-        {
-            this._appExit();   
-        }
-
-
-        /// <summary>
-        /// Brings up the about form with a simple string. 
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void aboutToolStripMenuItem_Click(object sender, EventArgs e)
+        private void _callAbout()
         {
             AboutForm about = new AboutForm("Sharp Auto center calculation program, Created by Ben dunn 2016, all rights reserved to sharpauto center.");
             about.Show();
+        }
+
+        /// <summary>
+        /// does the actual final calculation. Placed in a method to allow the key listener to reference the same values.
+        /// </summary>
+        private void _callFinalCalculation ()
+        {
+            if (BackGroundClasses.InputTester.TryParseDoubleNotBelow(this.BasePriceTextBox.Text, 0) &&
+                BackGroundClasses.InputTester.TryParseDoubleNotBelow(this.TradeInTextBox.Text, 0)) {
+                this._finalTotal = (this._totalValueBeforeTradeIn - (Double.Parse(this.TradeInTextBox.Text)));
+                String tempString = "";
+                if (this._finalTotal < 0)
+                {
+                    tempString = "-";
+                }
+                this._setText(tempString+this._finalTotal.ToString("C2"), this.AmountDueTextBox);
+            } else
+            {
+                this._firstException = new Exception("a value in one of your text boxes is invalid! please make sure" +
+                   " there are only number characters, and all values are positive!");
+            }
         }
 
         /// <summary>
@@ -269,8 +349,20 @@ namespace AssignmentTwo
         /// <param name="e"></param>
         private void calculateForm_Click(object sender, EventArgs e)
         {
-
+            this._callFinalCalculation(); 
         }
+
+        /// <summary>
+        /// calls the close function
+        ///
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void exitEvent_Click(object sender, EventArgs e)
+        {
+            this._appExit();
+        }
+
 
         /// <summary>
         /// calls the clear form method.
@@ -305,6 +397,16 @@ namespace AssignmentTwo
                         Color blackColor = Color.FromArgb(0, 0, 0);
                         this._changeTextColor(blackColor);
                         break;
+                    case "Color":
+                        this._colorDialog.ShowDialog();
+                        this._changeTextColor(_colorDialog.Color);
+
+                        break;
+                    case "Custom":
+                        this._colorDialog.ShowDialog();
+                        this._changeTextColor(_colorDialog.Color);
+
+                        break;
                 }
             }
             catch(InvalidCastException exception)
@@ -336,12 +438,98 @@ namespace AssignmentTwo
                         this._changeTextFont(this._defaultFont);
 
                         break;
+                    case "Font":
+                        this._fontDialog.ShowDialog();
+                        this.Font = _fontDialog.Font;
+                        break;
+                    case "Custom":
+                        this._fontDialog.ShowDialog();
+                        this.Font = _fontDialog.Font;
+                        break;
                 }
             }
             catch (InvalidCastException exception)
             {
                 this._firstException = exception;
             }
+        }
+
+        /// <summary>
+        /// Listens for key change values upon down list and adds them to
+        /// the current scope. 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void StackedListen_KeyDown(object sender, KeyEventArgs e)
+        {
+
+            if (!_pressedKeys.Contains(e.KeyCode.ToString()))
+            {   
+                _pressedKeys.Add(e.KeyCode.ToString());
+
+            }
+            String testString = "";
+            foreach(var k in _pressedKeys)
+            {
+                testString += k.ToString()+", ";
+            }
+            //this.TestLable.Text = testString; was used for debug to test the item codes, finished with and removed
+            if (_pressedKeys.Contains("ControlKey"))
+            {
+                this.AdditionalOptionsLabel.Focus();
+                if (_pressedKeys.Contains("X"))
+                {
+                    this._appExit();
+                    this._pressedKeys.Clear(); //cleans the pressed keys to make sure there is no blocking event code. Because I do not have this threaded, 
+                    //the multi key events can be interuppted by the message boxes and events for their creation leading too the released key event not
+                    //being caught leaving them in the list. by clearing them after the event, it means that the program has more, (probably perfect)
+                    //reliability.  
+                }
+                if (_pressedKeys.Contains("H"))
+                {
+                    this._callAbout();
+                    this._pressedKeys.Clear();
+                }
+                if (_pressedKeys.Contains("L"))
+                {
+                    this._clearControls();
+                    this._pressedKeys.Clear();
+                }
+                if (_pressedKeys.Contains("C"))
+                {
+                    this._callFinalCalculation();
+                    this._pressedKeys.Clear();
+                }
+                if (_pressedKeys.Contains("F"))
+                {
+                    this._fontDialog.ShowDialog();
+                    this.Font = _fontDialog.Font;
+                    this._pressedKeys.Clear();
+                }
+                if (_pressedKeys.Contains("O"))
+                {
+                    this._colorDialog.ShowDialog();
+                    this._changeTextColor(_colorDialog.Color);
+                    this._pressedKeys.Clear();
+                }
+
+
+
+            }
+
+
+        }
+
+        /// <summary>
+        /// Listens for key value releases and removes them from the current
+        /// scope. 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void StackedListen_KeyUp(object sender, KeyEventArgs e)
+        {
+            _pressedKeys.Remove(e.KeyCode.ToString());
+            
         }
 
 
@@ -379,10 +567,7 @@ namespace AssignmentTwo
         /// <param name="color"></param>
         private void _changeTextColor(Color color)
         {
-
             this.ForeColor = color;
-
-
         }
         /// <summary>
         /// changes the fonts of the form and all children. 
@@ -407,15 +592,8 @@ namespace AssignmentTwo
                 control.BackColor = color;
         }
 
-        /// <summary>
-        /// Trips the events through key presses. 
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void SharpAutoCenter_KeyPress(object sender, KeyPressEventArgs e)
-        {
 
-        }
+
     }
 
 }
